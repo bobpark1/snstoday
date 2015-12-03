@@ -17,16 +17,16 @@ class PageController < ApplicationController
                     fb_raw = JSON.parse(open(url, &:read))
                     fb_raw["data"].each do |d| #managing one post
                         like_number = d["likes"]["summary"]["total_count"]
-                        @fb = [d["id"].split('_')[1], like_number] #adding post id & like result to the list
+                        @fb << [d["id"].split('_')[1], like_number] #adding post id & like result to the list
                     end
                     #sorting most-liked posts top 10 within the pool
-                    #@fb.sort_by[|k| k[1]]
+                    @fb = @fb.sort_by{|k| k[1]}.reverse[0, 10]
                     #parsing more posts within a day
-                    #if (Time.now - Time.parse(fb_raw["data"].last["update_time"]))/(24*60*60) < 1
-                    #    url = d["paging"]["next"]
-                    #else
+                    if (Time.now - Time.parse(fb_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
+                        url = fb_raw["paging"]["next"]
+                    else
                         break
-                    #end
+                    end
                 end
             end
         end
