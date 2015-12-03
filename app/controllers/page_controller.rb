@@ -8,7 +8,7 @@ class PageController < ApplicationController
 
         #facebook parsing
         facebook = Page.where(snstype: 1)
-        @fb = {} #page id & like number
+        @fb = [] #page id & like number
         facebook.each do |page|
             page.pageid.each do |pid|
                 url = "https://graph.facebook.com/#{pid}/posts?access_token=1494493670846068|w0SyXYr6pvYCxt97JPycnTEZOUo&fields=id,likes.summary(true),updated_time"
@@ -20,7 +20,7 @@ class PageController < ApplicationController
                         @fb = [d["id"].split('_')[1], like_number] #adding post id & like result to the list
                     end
                     #sorting most-liked posts top 10 within the pool
-                    @fb.sort_by[|k| k[1]]
+                    #@fb.sort_by[|k| k[1]]
                     #parsing more posts within a day
                     #if (Time.now - Time.parse(fb_raw["data"].last["update_time"]))/(24*60*60) < 1
                     #    url = d["paging"]["next"]
