@@ -8,7 +8,7 @@ class PageController < ApplicationController
 
         #facebook parsing
         facebook = Page.where(snstype: 1)
-        @fb = []
+        @fb = [] #page id & like number
         @fbn = []
         facebook.each do |page|
             page.pageid.each do |pid|
@@ -16,7 +16,7 @@ class PageController < ApplicationController
                     url = "https://graph.facebook.com/#{pid}/posts?access_token=1494493670846068|w0SyXYr6pvYCxt97JPycnTEZOUo&fields=id,likes,updated_time"
                     fb_raw = JSON.parse(open(url, &:read))
                     fb_raw["data"].each do |d|
-                        @fb << d["id"].split('_')[1]
+                        @fb << [d["id"].split('_')[1]]
                     end
                     if (Time.parse(fb_raw["data"][0]["updated_time"])-Time.now)/(24*3600) > 1
                         break
