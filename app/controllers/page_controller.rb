@@ -8,20 +8,25 @@ class PageController < ApplicationController
 
         #facebook parsing
         facebook = Page.where(snstype: 1)
-        @fb = [] #page id & like number
-        @fbn = []
+        @fb = {} #page id & like number
         facebook.each do |page|
             page.pageid.each do |pid|
+                url = "https://graph.facebook.com/#{pid}/posts?access_token=1494493670846068|w0SyXYr6pvYCxt97JPycnTEZOUo&fields=id,likes.summary(true),updated_time"
                 while true
-                    url = "https://graph.facebook.com/#{pid}/posts?access_token=1494493670846068|w0SyXYr6pvYCxt97JPycnTEZOUo&fields=id,likes,updated_time"
+                    #parsing 25 json(newsfeed) data
                     fb_raw = JSON.parse(open(url, &:read))
-                    fb_raw["data"].each do |d|
-                        @fb << [d["id"].split('_')[1]]
+                    fb_raw["data"].each do |d| #managing one post
+                        like_number = d["likes"]["summary"]["total_count"]
+                        @fb = [d["id"].split('_')[1], like_number] #adding post id & like result to the list
                     end
-                    if (Time.parse(fb_raw["data"][0]["updated_time"])-Time.now)/(24*3600) > 1
+                    #sorting most-liked posts top 10 within the pool
+                    @fb.sort_by[|k| k[1]]
+                    #parsing more posts within a day
+                    #if (Time.now - Time.parse(fb_raw["data"].last["update_time"]))/(24*60*60) < 1
+                    #    url = d["paging"]["next"]
+                    #else
                         break
-                    end
-                    break
+                    #end
                 end
             end
         end
@@ -34,7 +39,7 @@ class PageController < ApplicationController
         instagram = Page.where(snstype: 3)
         @insta = []
         instagram.each do |i|
-            insta_raw = open("https://api.instagram.com/v1/tags/#{i.pageid.to_i}/media/recent?access_token=2129843127.1677ed0.383efa51b3a743239e8ff9193da037d0", &:read)
+
         end
     end
     

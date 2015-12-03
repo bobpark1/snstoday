@@ -1,10 +1,11 @@
+<%=@fb%>
 <div class="row">
     <div class="col-xs-4">
         <div class="page-header">
             <h1>On Facebook &nbsp; <small>Today</small></h1>
         </div>
-        <% @fb.each do |postid|%>
-        <div class="fb-post" data-href="https://www.facebook.com/SNUBamboo/posts/<%=postid%>/" data-width="300">
+        <% @fb.each do |post|%>
+        <div class="fb-post" data-href="https://www.facebook.com/SNUBamboo/posts/<%=post[0]%>/" data-width="300">
             <div class="fb-xfbml-parse-ignore">
             </div>
         </div><br><br>
