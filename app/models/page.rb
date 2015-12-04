@@ -1,3 +1,3 @@
 class Page < ActiveRecord::Base
-    serialize :pageid,Array
+    serialize :postid,Array
 end

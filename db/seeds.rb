@@ -10,4 +10,4 @@
 
 User.create(email: 'test@gmail.com', password: 00000000)
 
-Page.create(user_id: 1, snstype: 1, pageid: [560898400668463])
+Page.create(user_id: 1, snstype: 1, pagename: "서울대학교 대나무숲", pageid: "560898400668463", postid: [])

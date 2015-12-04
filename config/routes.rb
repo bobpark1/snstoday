@@ -2,7 +2,10 @@ Rails.application.routes.draw do
   devise_for :users
   
   root "page#index"
+  get "/update_page" => "page#update_page"
+  get "/update_post" => "page#update_post"
   get "/mypage" => "page#mypage"
+  post "/search" => "page#search"
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

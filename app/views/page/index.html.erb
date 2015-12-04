@@ -1,14 +1,16 @@
-<%=@fb%>
+<% if user_signed_in? %>
+
 <div class="row">
     <div class="col-xs-4">
         <div class="page-header">
             <h1>On Facebook &nbsp; <small>Today</small></h1>
         </div>
-        <% @fb.each do |post|%>
-        <div class="fb-post" data-href="https://www.facebook.com/SNUBamboo/posts/<%=post[0]%>/" data-width="300">
-            <div class="fb-xfbml-parse-ignore">
-            </div>
-        </div><br><br>
+        <% @fb.each do |page|%>
+            <a href="/update_post?user=<%=current_user.id%>&page=<%=page[0]%>&post=<%=page[1]%>">이 포스팅 저장해놓기</a>
+            <div class="fb-post" data-href="https://www.facebook.com/<%=page[0]%>/posts/<%=page[1]%>/" data-width="300">
+                <div class="fb-xfbml-parse-ignore">
+                </div>
+            </div><br><br>
         <% end %>
     </div>
     <div class="col-xs-4">
@@ -25,4 +27,31 @@
         <% @insta.each do |postid|%>
             <% end %>
     </div>
-
+    
+<!--로그인하지 않았을 경우 랜딩페이지-->
+<% else %>
+    <div class="col-xs-12">
+        <div class="page-header">
+            <h1>SNS, &nbsp; <small>하루 지나고 나면 묻혀버리고 보지 못하죠?</small></h1>
+        </div>
+        <div class="panel panel-default" align="center">
+            <div class="panel-body">
+                <h3>관심있는 페이지를 내 계정에 저장하세요.</h3>
+                <img src=""/>
+                <p>하루동안 SNS에서 가장 HOT했던 이슈들만 모아 보여드립니다</p>
+            </div>
+            <div class="panel-body">
+                <h3>두고두고 볼 정보를 내 계정에 저장하세요</h3>
+                <img src=""/>
+                <p>모았던 정보를 한꺼번에 보여드립니다</p>
+            </div>
+            <div class="panel-body">
+                <h3>로그인만 하면 이 모든 서비스가 여러분의 것입니다</h3>
+                <img src=""/>
+                <p>지금 바로 시작하세요!</p>
+                <button class="btn btn-success" onClick="location.href='/users/sign_up'">SIGN UP</button>
+                <button class="btn btn-default" onClick="location.href='/users/sign_in'">SIGN IN</button>
+            </div>
+        </div>
+    </div>
+<% end %>

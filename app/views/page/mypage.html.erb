@@ -1,8 +1,46 @@
 <div class="row">
-    <div class="page-header">
-        <h1>Facebook Follow List &nbsp; <input type="text"><span class="glyphicon glyphicon-plus"></span></h1>
+    <div class="col-xs-12 col-sm-3">
+        <div class="page-header">
+            <h1>Search &nbsp;</h1>
+        </div>
+        <%= form_tag "/search", method: "post" do %>
+            <select name="snstype" required>
+                <option>select sns...</option>
+                <option value="1">facebook page</option>
+                <option value="2">twitter user</option>
+                <option value="3">instagram user</option>
+            </select>
+            <input type="text" name="name" placeholder="search...">
+            <input type="submit">
+        <% end %>
+        <ul class="list-group">
+            <% @search.each do |s| %>
+            <li class="list-group-item">
+                <span>
+                    <img src="<%=s.url%>"/>
+                    <%=s.name%>
+                    <a href="/update_page?id=<%=current_user.id%>&snstype=<%=s.snstype%>pagename=<%=s.name%>&pageid=<%=s.pid.to_i%>">팔로우</a>
+                </span>
+            </li>
+            <% end %>
+        </ul>
     </div>
-    <div class="col-xs-12">
+    <div class="col-xs-12 col-sm-9">
+        <div class="page-header">
+            <h1>Page Follow List &nbsp;</h1>
+        </div>
+
+        <% @result.each do |r| %>
+            <div class="col-xs-6 col-sm-3">
+                <div class="thumbnail">
+                    <img src="<%=r[1]%>" alt="...">
+                    <div class="caption">
+                        <p><%=r[0]%></p>
+                        <a href="/update_page?id=<%=current_user.id%>&pageid=<%=r[2]%>">언팔로우</a>
+                    </div>
+                </div>
+            </div>
+        <% end %>
 
     </div>
 </div>

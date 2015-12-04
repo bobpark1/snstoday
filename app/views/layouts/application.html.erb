@@ -32,7 +32,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <% if user_signed_in? %>
-        <li><a href="/mypage"><span>마이페이지</span></a></li>
+        <li><a href="/mypage?id=current_user.id"><span>마이페이지</span></a></li>
         <li><a href="/users/sign_out" data-method="delete"><span>로그아웃</span></a></li>
         <% else %>
         <li><a href="/users/sign_in"><span>로그인</span></a></li>

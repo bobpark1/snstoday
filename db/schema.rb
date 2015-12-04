@@ -11,12 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151126121837) do
+ActiveRecord::Schema.define(version: 20151204015852) do
 
   create_table "pages", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "snstype"
+    t.text     "pagename"
     t.text     "pageid"
+    t.text     "postid"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "searches", force: :cascade do |t|
+    t.integer  "snstype"
+    t.text     "name"
+    t.text     "pid"
+    t.text     "url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
