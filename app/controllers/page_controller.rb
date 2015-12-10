@@ -1,6 +1,12 @@
 class PageController < ApplicationController
     require 'open-uri'
     require 'date'
+    
+    def collect_with_max_id(collection=[], max_id=nil, &block)
+      response = yield(max_id)
+      collection += response
+      response.empty? ? collection.flatten : collect_with_max_id(collection, response.last.id - 1, &block)
+    end
 
     def index
 
@@ -22,7 +28,7 @@ class PageController < ApplicationController
                     fb_raw = JSON.parse(open(url, &:read))
                     fb_raw["data"].each do |d| #managing one post
                         like_number = d["likes"]["summary"]["total_count"]
-                        @fb << [p.pageid.to_i, d["id"].split('_')[1], like_number] #adding post id & like result to the list
+                        @fb << [p.pageid.to_i, d["id"].split('_')[-1], like_number] #adding post id & like result to the list
                     end
                     #sorting most-liked posts top 10 within the pool
                     @fb = @fb.sort_by{|k| k[2]}.reverse[0, lst_number]
@@ -46,12 +52,12 @@ class PageController < ApplicationController
                 lst_number = params[:lst]
             end
             @twit.each do |p|
-                url = ""
+                url = "http://twitter.com/#{p.pageid.to_i}/posts?access_token=259079311-WNQpogoDgkBuU3IjJ3rZZUMzrrIC2qk6jC03vJb9"
                 while true
                 #parsing 25 json(newsfeed) data
                     twitter_raw = JSON.parse(open(url, &:read))
                     twitter_raw["data"].each do |d| #managing one post
-                        like_number = d["count"]["summary"]["total_count"]
+                        like_number = d["count"]
                         @twit << [p.pageid.to_i, d["id"].split('_')[1], like_number] #adding post id & like result to the list
                     end
                     #sorting most-liked posts top 10 within the pool
