@@ -26,15 +26,19 @@ class PageController < ApplicationController
                 while true
                     #parsing 25 json(newsfeed) data
                     fb_raw = JSON.parse(open(url, &:read))
-                    fb_raw["data"].each do |d| #managing one post
-                        like_number = d["likes"]["summary"]["total_count"]
-                        @fb << [p.pageid.to_i, d["id"].split('_')[-1], like_number] #adding post id & like result to the list
-                    end
-                    #sorting most-liked posts top 10 within the pool
-                    @fb = @fb.sort_by{|k| k[2]}.reverse[0, lst_number]
-                    #parsing more posts within a day
-                    if (Time.now - Time.parse(fb_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
-                        url = fb_raw["paging"]["next"]
+                    unless fb_raw["data"][-1] == nil
+                        fb_raw["data"].each do |d| #managing one post
+                            like_number = d["likes"]["summary"]["total_count"]
+                            @fb << [p.pageid.to_i, d["id"].split('_')[-1], like_number] #adding post id & like result to the list
+                        end
+                        #sorting most-liked posts top 10 within the pool
+                        @fb = @fb.sort_by{|k| k[2]}.reverse[0, lst_number]
+                        #parsing more posts within a day
+                        if (Time.now - Time.parse(fb_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
+                            url = fb_raw["paging"]["next"]
+                        else
+                            break
+                        end
                     else
                         break
                     end
