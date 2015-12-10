@@ -36,9 +36,35 @@ class PageController < ApplicationController
             end
             
             #twit parsing
-            twitter = Page.where(snstype: 2)
-            @twit = []
-
+            @twitter = Page.where(snstype: 2)
+            @twit = [] #post id & count 
+            @pid = []
+            
+            if params[:lst] == nil
+                lst_number = 10
+            else    
+                lst_number = params[:lst]
+            end
+            @twit.each do |p|
+                url = ""
+                while true
+                #parsing 25 json(newsfeed) data
+                    twitter_raw = JSON.parse(open(url, &:read))
+                    twitter_raw["data"].each do |d| #managing one post
+                        like_number = d["count"]["summary"]["total_count"]
+                        @twit << [p.pageid.to_i, d["id"].split('_')[1], like_number] #adding post id & like result to the list
+                    end
+                    #sorting most-liked posts top 10 within the pool
+                    @twit = @twit.sort_by{|k| k[2]}.reverse[0, lst_number]
+                    #parsing more posts within a day
+                    if (Time.now - Time.parse(twitter_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
+                        url = twitter_raw["paging"]["next"]
+                    else
+                        break
+                    end
+                end
+            end
+            
             
             #instagram parsing
             instagram = Page.where(snstype: 3)
