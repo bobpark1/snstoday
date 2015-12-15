@@ -56,25 +56,29 @@ class PageController < ApplicationController
                 lst_number = params[:lst]
             end
             @twit.each do |p|
-                url = "http://twitter.com/#{p.pageid.to_i}/posts?access_token=259079311-WNQpogoDgkBuU3IjJ3rZZUMzrrIC2qk6jC03vJb9"
+                url = "https://api.twitter.com/1.1/search/tweets.json?q=from%3A#{p.pageid.to_i}%20&result_type=popular"
                 while true
-                #parsing 25 json(newsfeed) data
+                #parsing 25 json(tweets) data
                     twitter_raw = JSON.parse(open(url, &:read))
-                    twitter_raw["data"].each do |d| #managing one post
-                        like_number = d["count"]
-                        @twit << [p.pageid.to_i, d["id"].split('_')[1], like_number] #adding post id & like result to the list
-                    end
-                    #sorting most-liked posts top 10 within the pool
-                    @twit = @twit.sort_by{|k| k[2]}.reverse[0, lst_number]
-                    #parsing more posts within a day
-                    if (Time.now - Time.parse(twitter_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
-                        url = twitter_raw["paging"]["next"]
+                    unless twitter_raw["data"][-1] == nil
+                        twitter_raw["data"].each do |d| #managing one post
+                            like_number = d["count"]
+                            @twit << [p.pageid.to_i, d["id"].split('_')[-1], like_number] #adding post id & like result to the list
+                        end
+                        #sorting most-liked posts top 10 within the pool
+                        @twit = @twit.sort_by{|k| k[2]}.reverse[0, lst_number]
+                        #parsing more posts within a day
+                        if (Time.now - Time.parse(fb_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
+                            url = twitter_raw["paging"]["next"]
+                        else
+                            break
+                        end
                     else
                         break
                     end
                 end
             end
-            
+
             
             #instagram parsing
             instagram = Page.where(snstype: 3)
