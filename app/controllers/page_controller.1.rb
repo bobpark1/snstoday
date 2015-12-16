@@ -76,7 +76,7 @@ class PageController < ApplicationController
             end
             
             
-            #instagram tag parsing
+            #instagram user parsing
             @instagram = Page.where(snstype: 3)
             @insta = [] #post id & count 
             @pid = []
@@ -163,7 +163,11 @@ class PageController < ApplicationController
             Search.create(name: "!", pid: "!", url: "!")
 
         else    #instagram search
-            Search.create(name: "!", pid: "!", url: "!")
+            url = "https://api.instagram.com/v1/users/search?q=#{CGI.escape(params[:name])}&access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
+            insta_raw = JSON.parse(open(url, &read))
+            insta_raw["data"].each do |d|
+                pic = d["data"]["profile_picture"]
+                Search.create(snstype: 3, name: "#{d["data"]["full_name"]}", pid: "#{d["id"]}", url: pic)
         end
         
         redirect_to "/mypage"
