@@ -13,11 +13,12 @@
             <input type="text" name="name" placeholder="search...">
             <input type="submit">
         <% end %>
+        <%= @test %>
         <ul class="list-group">
             <% @search.each do |s| %>
             <li class="list-group-item">
                 <span>
-                    <img src="<%=s.url%>"/>
+                    <img src="<%=s.url%>" style="max-height: 75px;"/>
                     <%=s.name%>
                     <a href="/update_page?id=<%=current_user.id%>&snstype=<%=s.snstype%>&pagename=<%=s.name%>&pageid=<%=s.pid.to_i%>">팔로우</a>
                 </span>
