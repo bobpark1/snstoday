@@ -56,31 +56,27 @@ class PageController < ApplicationController
                 lst_number = params[:lst]
             end
             @twit.each do |p|
-                url = "https://api.twitter.com/1.1/search/tweets.json?q=from%3A#{p.pageid.to_i}%20&result_type=popular"
+                url = "http://twitter.com/#{p.pageid.to_i}/posts?access_token=259079311-WNQpogoDgkBuU3IjJ3rZZUMzrrIC2qk6jC03vJb9"
                 while true
-                #parsing 25 json(tweets) data
+                #parsing 25 json(newsfeed) data
                     twitter_raw = JSON.parse(open(url, &:read))
-                    unless twitter_raw["data"][-1] == nil
-                        twitter_raw["data"].each do |d| #managing one post
-                            like_number = d["count"]
-                            @twit << [p.pageid.to_i, d["id"].split('_')[-1], like_number] #adding post id & like result to the list
-                        end
-                        #sorting most-liked posts top 10 within the pool
-                        @twit = @twit.sort_by{|k| k[2]}.reverse[0, lst_number]
-                        #parsing more posts within a day
-                        if (Time.now - Time.parse(fb_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
-                            url = twitter_raw["paging"]["next"]
-                        else
-                            break
-                        end
+                    twitter_raw["data"].each do |d| #managing one post
+                        like_number = d["count"]
+                        @twit << [p.pageid.to_i, d["id"].split('_')[1], like_number] #adding post id & like result to the list
+                    end
+                    #sorting most-liked posts top 10 within the pool
+                    @twit = @twit.sort_by{|k| k[2]}.reverse[0, lst_number]
+                    #parsing more posts within a day
+                    if (Time.now - Time.parse(twitter_raw["data"][-1]["updated_time"]))/(24*60*60) < 1
+                        url = twitter_raw["paging"]["next"]
                     else
                         break
                     end
                 end
             end
-
             
-            #instagram user parsing
+            
+            #instagram tag parsing
             @instagram = Page.where(snstype: 3)
             @insta = [] #post id & count 
             @pid = []
@@ -90,8 +86,8 @@ class PageController < ApplicationController
             else    
                 lst_number = params[:lst]
             end
-            @instagram.each do |p|
-                url = "https://api.instagram.com/v1/users/#{p.pageid.to_i}/media/recent/?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
+             @instagram.each do |p|
+                url = "https://api.instagram.com/v1/tags/#{p.pageid.to_i}/media/recent?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
                 while true
                 #parsing 25 json(newsfeed) data
                     insta_raw = JSON.parse(open(url, &:read))
@@ -102,7 +98,7 @@ class PageController < ApplicationController
                     #sorting most-liked posts top 10 within the pool
                     @insta = @insta.sort_by{|k| k[2]}.reverse[0, lst_number]
                     #parsing more posts within a day
-                    if (Time.now - Time.at(Time.parse(insta_raw["data"][-1]["created_time"])))/(24*60*60) < 1
+                    if (Time.now - Time.at(insta_raw["data"][-1]["created_time"].to_i))/(24*60*60) < 1
                         url = insta_raw["pagination"]["next_url"]
                     else
                         break
@@ -141,8 +137,9 @@ class PageController < ApplicationController
             page = Page.where(user_id: current_user.id)
             @result = []
             page.each do |p|
-                img = "https://graph.facebook.com/#{p.pageid}/picture/uploaded&access_token=1494493670846068%7Cw0SyXYr6pvYCxt97JPycnTEZOUo"
-                @result << [p.pagename, img, p.pageid]
+               
+                    img = "https://graph.facebook.com/#{p.pageid}/picture/uploaded&access_token=1494493670846068%7Cw0SyXYr6pvYCxt97JPycnTEZOUo"
+                    @result << [p.pagename, img, p.pageid]
             end
         else
             redirect_to :root
@@ -166,23 +163,20 @@ class PageController < ApplicationController
         elsif params[:snstype] == "2"   #twitter search
             Search.create(name: "!", pid: "!", url: "!")
 
-<<<<<<< HEAD:app/controllers/page_controller.1.rb
-        else    #instagram user search
-            url = "https://api.instagram.com/v1/users/search?q=#{CGI.escape(params[:name])}&access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
-            insta_search = JSON.parse(open(url, &read))
-            insta_search["data"].each do |d|
-                pic = d["profile_picture"]
-                Search.create(snstype: 3, name: "#{d["full_name"]}", pid: "#{d["id"]}", url: pic)
-            end
-=======
-        else    #instagram search
+        else    #instagram tag search
             url = "https://api.instagram.com/v1/tags/COEX/media/recent?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131&max_tag_id=1140577167865244233"
             i_raw = JSON.parse(open(url, &:read))
-            @test = []
-                pic_url = i_raw["data"][0]["images"]["standard_resolution"]["url"]
-                Search.create(snstype: 3, name: "coex", pid: "coex", url: pic_url)
->>>>>>> e1ba364200a7bfb1c77d60045347637882614bc3:app/controllers/page_controller.rb
+            pic_url = i_raw["data"][0]["images"]["standard_resolution"]["url"]
+            Search.create(snstype: 3, name: "coex", pid: "coex", url: pic_url)
+            #url = "https://api.instagram.com/v1/tags/#{CGI.escape(params[:name])}/media/recent?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
+            #insta_raw = JSON.parse(open(url, &:read))
+            #pic_url = insta_raw["data"][0]["images"]["standard_resolution"]["url"]
+            #Search.create(snstype: 3, name: "#{d["full_name"]}", pid: "#{d["id"]}", url: pic_url)
         end
         redirect_to "/mypage"
     end
 end
+    
+
+
+        

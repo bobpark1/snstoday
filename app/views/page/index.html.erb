@@ -25,6 +25,11 @@
             <h1>On Instagram &nbsp; <small>Today</small></h1>
         </div>
         <% @insta.each do |postid|%>
+            <a href="/update_post?user=<%=current_user.id%>&page=<%=postid[0]%>&post=<%=postid[1]%>">이 포스팅 저장해놓기</a>
+            <br><span>링크:</span><a href="<%=postid[3]%>"> <%=postid[3]%> </a>
+            <div class="insta-post" data-href="<%=postid[3]%>" data-width="300" >
+                <img src="<%=postid[4]%>" style="max-height: 275px;"/>
+            </div><br><br>
             <% end %>
     </div>
     
