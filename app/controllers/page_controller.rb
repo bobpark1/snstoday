@@ -98,8 +98,8 @@ class PageController < ApplicationController
                     #sorting most-liked posts top 10 within the pool
                     @insta = @insta.sort_by{|k| k[2]}.reverse[0, lst_number]
                     #parsing more posts within a day
-                    if (Time.now - Time.at(Time.parse(insta_raw["data"][-1]["created_time"])))/(24*60*60) < 1
-                        url = insta_raw["paging"]["next"]
+                    if (Time.now - Time.at(insta_raw["data"][-1]["created_time"].to_i))/(24*60*60) < 1
+                        url = insta_raw["pagination"]["next_url"]
                     else
                         break
                     end
@@ -137,16 +137,9 @@ class PageController < ApplicationController
             page = Page.where(user_id: current_user.id)
             @result = []
             page.each do |p|
-                if params[:snstype] == "1"
+               
                     img = "https://graph.facebook.com/#{p.pageid}/picture/uploaded&access_token=1494493670846068%7Cw0SyXYr6pvYCxt97JPycnTEZOUo"
                     @result << [p.pagename, img, p.pageid]
-            
-                elsif params[:snstype] == "2"
-                
-            
-                else #instagram
-                    img = p["images"]["thumbnail"]["url"]
-                end
             end
         else
             redirect_to :root
@@ -171,12 +164,15 @@ class PageController < ApplicationController
             Search.create(name: "!", pid: "!", url: "!")
 
         else    #instagram tag search
-            url = "https://api.instagram.com/v1/tags/search?q=코엑스&access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
-            insta_raw = JSON.parse(open(url, &:read))
-            @pic_url = insta_raw["data"] #[0]["images"]["thumbnail"]["url"]
+            url = "https://api.instagram.com/v1/tags/COEX/media/recent?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131&max_tag_id=1140577167865244233"
+            i_raw = JSON.parse(open(url, &:read))
+            pic_url = i_raw["data"][0]["images"]["standard_resolution"]["url"]
+            Search.create(snstype: 3, name: "coex", pid: "coex", url: pic_url)
+            #url = "https://api.instagram.com/v1/tags/#{CGI.escape(params[:name])}/media/recent?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
+            #insta_raw = JSON.parse(open(url, &:read))
+            #pic_url = insta_raw["data"][0]["images"]["standard_resolution"]["url"]
             #Search.create(snstype: 3, name: "#{d["full_name"]}", pid: "#{d["id"]}", url: pic_url)
         end
-        
         redirect_to "/mypage"
     end
 end
