@@ -86,8 +86,8 @@ class PageController < ApplicationController
             else    
                 lst_number = params[:lst]
             end
-             @instagram.each do |p|
-                url = "https://api.instagram.com/v1/tags/#{p.pageid.to_i}/media/recent?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
+            @instagram.each do |p|
+                url = "https://api.instagram.com/v1/users/#{p.pageid.to_i}/media/recent/?access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
                 while true
                 #parsing 25 json(newsfeed) data
                     insta_raw = JSON.parse(open(url, &:read))
@@ -99,7 +99,7 @@ class PageController < ApplicationController
                     @insta = @insta.sort_by{|k| k[2]}.reverse[0, lst_number]
                     #parsing more posts within a day
                     if (Time.now - Time.at(Time.parse(insta_raw["data"][-1]["created_time"])))/(24*60*60) < 1
-                        url = insta_raw["paging"]["next"]
+                        url = insta_raw["pagination"]["next_url"]
                     else
                         break
                     end
@@ -162,18 +162,14 @@ class PageController < ApplicationController
         elsif params[:snstype] == "2"   #twitter search
             Search.create(name: "!", pid: "!", url: "!")
 
-        else    #instagram search
+        else    #instagram user search
             url = "https://api.instagram.com/v1/users/search?q=#{CGI.escape(params[:name])}&access_token=1904087850.1677ed0.184cfc7a076f4c598ddf3637e3d92131"
-            insta_raw = JSON.parse(open(url, &read))
-            insta_raw["data"].each do |d|
-                pic = d["data"]["profile_picture"]
-                Search.create(snstype: 3, name: "#{d["data"]["full_name"]}", pid: "#{d["id"]}", url: pic)
+            insta_search = JSON.parse(open(url, &read))
+            insta_search["data"].each do |d|
+                pic = d["profile_picture"]
+                Search.create(snstype: 3, name: "#{d["full_name"]}", pid: "#{d["id"]}", url: pic)
+            end
         end
-        
         redirect_to "/mypage"
     end
 end
-    
-
-
-        
