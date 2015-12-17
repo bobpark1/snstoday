@@ -92,8 +92,10 @@ class PageController < ApplicationController
                 #parsing 25 json(newsfeed) data
                     insta_raw = JSON.parse(open(url, &:read))
                     insta_raw["data"].each do |d| #managing one post
-                        like_number = d["likes"]["count"]
-                        @insta << [p.pageid.to_i, d["id"].split('_')[0], like_number, d["link"], d["images"]["standard_resolution"]["url"]] #adding post id & like result to the list
+                        if (Time.now - Time.at(d["created_time"].to_i))/(24*60*60) < 1
+                            like_number = d["likes"]["count"]
+                            @insta << [p.pageid.to_i, d["id"].split('_')[0], like_number, d["link"], d["images"]["standard_resolution"]["url"]] #adding post id & like result to the list
+                        end
                     end
                     #sorting most-liked posts top 10 within the pool
                     @insta = @insta.sort_by{|k| k[2]}.reverse[0, lst_number]
